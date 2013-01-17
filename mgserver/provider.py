@@ -20,48 +20,25 @@ class ExampleProvider(OAuthProvider):
     def nonce_length(self):
         return 20, 40
 
-    @require_logged_in
     def authorize(self):
+        # HACK: authorize directly if uid is provided and not password protected
+        uid = request.values.get('uid')
+        user = User.find_one({"_id": ObjectId(uid)}) if uid else None
+        if (user is not None and user["email"] is None and user["pw_hash"] is None):
+            token = request.values.get("oauth_token")
+            return self.authorized(token)
+
+        # Check logged in
+        if g.user is None:
+            next_url = url_for("login") + "?next=" + request.url
+            return redirect(next_url)
+
         if request.method == u"POST":
             token = request.form.get("oauth_token")
             return self.authorized(token)
         else:
-            # TODO: Authenticate client
             token = request.args.get(u"oauth_token")
             return render_template(u"authorize.html", token=token)
-
-    @require_logged_in
-    def register(self):
-        if request.method == u"POST":
-            client_key = self.generate_client_key()
-            secret = self.generate_client_secret()
-            # TODO: input sanitisation?
-            name = request.form.get(u"name")
-            description = request.form.get(u"description")
-            callback = request.form.get(u"callback")
-            pubkey = request.form.get(u"pubkey")
-            # TODO: redirect?
-            # TODO: pubkey upload
-            # TODO: csrf
-            info = {
-                u"client_key": client_key,
-                u"name": name,
-                u"description": description,
-                u"secret": secret,
-                u"pubkey": pubkey
-            }
-            client = Client(**info)
-            client['callbacks'].append(callback)
-            client['resource_owner_id'] = g.user['_id']
-            client_id = Client.insert(client)
-            g.user.client_ids.append(client_id)
-            User.get_collection().save(g.user)
-            return render_template(u"client.html", **info)
-        else:
-            clients = Client.get_collection().find({'_id': {'$in':
-                [ObjectId(oid) for oid in g.user.client_ids]}})
-            return render_template(u"register.html", clients=clients)
-
 
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None):
