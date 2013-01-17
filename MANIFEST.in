@@ -1,0 +1,3 @@
+include README.md LICENSE
+recursive-include mgserver/templates *
+recursive-include mgserver/static *
