@@ -1,14 +1,22 @@
 from flask import Flask, request
 from provider import ExampleProvider
 from models import AccessToken, ResourceOwner as User
+from flaskext.bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config.update(
-    DATABASE_URI="",
-    SECRET_KEY="debugging key"
+    DEBUG = True,
+    TESTING = False,
+    MONGO_HOST = "localhost",
+    MONGO_PORT = 27017,
+    SECRET_KEY = "debugging key",
+    DUMMY_EMAIL = "dummy@example.com",
+    DUMMY_PW_HASH = "dummyhash321",
 )
+app.config.from_pyfile('custom.cfg', True)
 
 provider = ExampleProvider(app)
+bcrypt = Bcrypt(app)
 
 # Imported to setup views
 import login

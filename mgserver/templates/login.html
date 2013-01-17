@@ -3,10 +3,13 @@
 {% block body %}
   <form action="" method="POST">
     {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
-    <label>OpenID</label>
-      <input type=text name=openid size=30/>
-      <br/>
-      <button type="submit" class="btn">Sign in</button>
-      <input type=hidden name=next value="{{ next }}">
+    <label>Email</label>
+    <input type=text name=email size=30/>
+    <br/>
+    <label>Password</label>
+    <input type=password name=password size=30/>
+    <br/>
+    <button type="submit" class="btn">Sign in</button>
+    <input type=hidden name=next value="{{ next }}">
   </form>
 {% endblock %}
