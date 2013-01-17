@@ -3,7 +3,7 @@ from flask.ext.oauthprovider import OAuthProvider
 from bson.objectid import ObjectId
 from models import ResourceOwner as User, Client, Nonce
 from models import RequestToken, AccessToken
-from utils import require_openid
+from utils import require_logged_in
 
 
 class ExampleProvider(OAuthProvider):
@@ -14,13 +14,13 @@ class ExampleProvider(OAuthProvider):
 
     @property
     def realms(self):
-        return [u"secret", u"trolling"]
+        return [u"users", u"vendors", u"admins"]
 
     @property
     def nonce_length(self):
         return 20, 40
 
-    @require_openid
+    @require_logged_in
     def authorize(self):
         if request.method == u"POST":
             token = request.form.get("oauth_token")
@@ -30,9 +30,9 @@ class ExampleProvider(OAuthProvider):
             token = request.args.get(u"oauth_token")
             return render_template(u"authorize.html", token=token)
 
-    @require_openid
+    @require_logged_in
     def register(self):
-        if request.method == u'POST':
+        if request.method == u"POST":
             client_key = self.generate_client_key()
             secret = self.generate_client_secret()
             # TODO: input sanitisation?

@@ -1,8 +1,10 @@
-from mgserver import app, bcrypt
+from mgserver import app
 from flask import flash, render_template, g, session, request
 from models import ResourceOwner as User
 from bson.objectid import ObjectId
+from flask.ext.bcrypt import Bcrypt
 
+bcrypt = Bcrypt(app)
 
 def get_next_url(request):
     """Returns the URL where we want to redirect to.  This will

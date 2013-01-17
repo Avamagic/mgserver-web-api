@@ -1,7 +1,6 @@
 from flask import Flask, request
 from provider import ExampleProvider
 from models import AccessToken, ResourceOwner as User
-from flaskext.bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config.update(
@@ -16,7 +15,6 @@ app.config.update(
 app.config.from_pyfile('custom.cfg', True)
 
 provider = ExampleProvider(app)
-bcrypt = Bcrypt(app)
 
 # Imported to setup views
 import login
@@ -35,7 +33,7 @@ def protected_view():
 
 
 @app.route("/protected_realm")
-@provider.require_oauth(realm="secret")
+@provider.require_oauth(realm="users")
 def protected_realm_view():
     token = request.oauth.resource_owner_key
     access_token = AccessToken.get_collection().find_one({'token':token})

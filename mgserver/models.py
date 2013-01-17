@@ -1,4 +1,5 @@
 import pymongo
+from datetime import datetime
 
 
 def get_db():
@@ -36,9 +37,14 @@ class ResourceOwner(Model):
     table = "users"
 
     def __init__(self, name="", email="", pw_hash=""):
+        now = datetime.utcnow()
+
         self.name = name
         self.email = email
         self.pw_hash = pw_hash
+        self.created_at = now
+        self.updated_since = now
+
         self.request_tokens = []
         self.access_tokens = []
         self.client_ids = []
@@ -51,13 +57,18 @@ class Client(Model):
     table = "clients"
 
     def __init__(self, client_key, mgserver_id, name, description, category, vendor, model, secret=None, pubkey=None):
-        self.client_key = client_key
-        self.mgserver_id = mgserver_id
+        now = datetime.utcnow()
+
         self.name = name
         self.description = description
         self.category = category
         self.vendor = vendor
         self.model = model
+        self.mgserver_id = mgserver_id
+        self.created_at = now
+        self.updated_since = now
+
+        self.client_key = client_key
         self.secret = secret
         self.pubkey = pubkey
         self.request_tokens = []

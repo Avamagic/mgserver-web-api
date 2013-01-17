@@ -2,7 +2,7 @@ from functools import wraps
 from flask import g, url_for, request, redirect
 
 
-def require_openid(f):
+def require_logged_in(f):
     """Require user to be logged in."""
     @wraps(f)
     def decorator(*args, **kwargs):
