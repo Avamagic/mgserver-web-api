@@ -1,5 +1,6 @@
 import pymongo
 from datetime import datetime
+import uuid
 
 
 def get_db():
@@ -17,6 +18,10 @@ class Model(dict):
     @classmethod
     def find_one(cls, attrs):
         return cls.get_collection().find_one(attrs)
+
+    @classmethod
+    def find(cls, attrs):
+        return cls.get_collection().find(attrs)
 
     @classmethod
     def insert(cls, obj):
@@ -56,7 +61,7 @@ class ResourceOwner(Model):
 class Client(Model):
     table = "clients"
 
-    def __init__(self, client_key, mgserver_id, name, description, category, vendor, model, secret=None, pubkey=None):
+    def __init__(self, client_key, name, description, category, vendor, model, secret=None, pubkey=None):
         now = datetime.utcnow()
 
         self.name = name
@@ -64,7 +69,8 @@ class Client(Model):
         self.category = category
         self.vendor = vendor
         self.model = model
-        self.mgserver_id = mgserver_id
+
+        self.mgserver_id = uuid.uuid1()
         self.created_at = now
         self.updated_since = now
 

@@ -18,6 +18,7 @@ provider = ExampleProvider(app)
 
 # Imported to setup views
 import login
+import resource
 
 @app.route('/callback')
 def callback():
