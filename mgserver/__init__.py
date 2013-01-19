@@ -11,6 +11,7 @@ app.config.update(
     SECRET_KEY = "debugging key",
     DUMMY_EMAIL = "dummy@example.com",
     DUMMY_PW_HASH = "dummyhash321",
+    OTP_SECRET_KEY = "base32secret3232", # use pyotp.random_base32() to generate
 )
 app.config.from_pyfile('custom.cfg', True)
 

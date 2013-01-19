@@ -61,7 +61,7 @@ class ResourceOwner(Model):
 class Client(Model):
     table = "clients"
 
-    def __init__(self, client_key, name, description, category, vendor, model, secret=None, pubkey=None):
+    def __init__(self, client_key, secret, resource_owner_id, name="", description="", category="", vendor="", model=""):
         now = datetime.utcnow()
 
         self.name = name
@@ -76,11 +76,10 @@ class Client(Model):
 
         self.client_key = client_key
         self.secret = secret
-        self.pubkey = pubkey
         self.request_tokens = []
         self.access_tokens = []
         self.callbacks = []
-        self.resource_owner_id = ""
+        self.resource_owner_id = resource_owner_id
 
     def __repr__(self):
         return "<Client (%s, %s)>" % (self.name, self.id)

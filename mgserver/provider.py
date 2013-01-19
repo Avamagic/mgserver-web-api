@@ -1,4 +1,4 @@
-from flask import request, render_template
+from flask import request, render_template, g
 from flask.ext.oauthprovider import OAuthProvider
 from bson.objectid import ObjectId
 from models import ResourceOwner as User, Client, Nonce
@@ -24,7 +24,8 @@ class ExampleProvider(OAuthProvider):
         # HACK: authorize directly if uid is provided and not password protected
         uid = request.values.get('uid')
         user = User.find_one({"_id": ObjectId(uid)}) if uid else None
-        if (user is not None and user["email"] is None and user["pw_hash"] is None):
+        if (user is not None and user["email"] == "" and user["pw_hash"] == ""):
+            g.user = user
             token = request.values.get("oauth_token")
             return self.authorized(token)
 
