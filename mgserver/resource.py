@@ -205,9 +205,9 @@ class Device(restful.Resource):
         return device
 
 
-api.add_resource(Seed, '/seeds')
-api.add_resource(UserList, '/users')
-api.add_resource(User, '/users/<string:user_id>')
-api.add_resource(DeviceList, '/devices')
-api.add_resource(Device, '/devices/<string:device_id>')
-api.add_resource(Myself, '/me')
+api.add_resource(Seed, '/v1/seeds')
+api.add_resource(UserList, '/v1/users')
+api.add_resource(User, '/v1/users/<string:user_id>')
+api.add_resource(DeviceList, '/v1/devices')
+api.add_resource(Device, '/v1/devices/<string:device_id>')
+api.add_resource(Myself, '/v1/me')

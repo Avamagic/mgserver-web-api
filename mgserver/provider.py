@@ -9,6 +9,22 @@ from utils import require_logged_in
 class ExampleProvider(OAuthProvider):
 
     @property
+    def request_token_url(self):
+        return u'/v1/request_token'
+
+    @property
+    def access_token_url(self):
+        return u'/v1/access_token'
+
+    @property
+    def register_url(self):
+        return u'/v1/register'
+
+    @property
+    def authorize_url(self):
+        return u'/v1/authorize'
+
+    @property
     def enforce_ssl(self):
         return False
 
