@@ -93,9 +93,10 @@ class Seed(restful.Resource):
         """Register a new user account and the initial client."""
         args = parser.parse_args()
 
-        totp = pyotp.TOTP(app.config["OTP_SECRET_KEY"])
+        totp = pyotp.TOTP(app.config["OTP_SECRET_KEY"],
+                          interval=app.config["OTP_INTERVAL"])
         if not totp.verify(args["otp"]):
-            abort(400, message="OTP incorrect")
+            abort(400, message="OTP incorrect, expect {}, got {}".format(totp.now(), args["otp"]))
 
         user_id = create_user()
         device_id = create_client(
