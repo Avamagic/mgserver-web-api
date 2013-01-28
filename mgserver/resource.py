@@ -188,13 +188,14 @@ class DeviceList(restful.Resource):
 
         return Client.find_one({'_id': device_id})
 
-    @marshal_with(device_list_fields)
     def get(self):
         user = get_user_or_abort()
-        clients = Client.get_collection().find(
-            {'_id': {'$in': [ObjectId(oid) for oid in user.client_ids]}})
-        return clients
-
+        clients = Client.find(
+            {'_id': {'$in': [oid for oid in user.client_ids]}})
+        clients_marshaled = []
+        for client in clients:
+            clients_marshaled.append(marshal(client, device_fields))
+        return {'results': clients_marshaled}
 
 class Device(restful.Resource):
     method_decorators = [provider.require_oauth(realm="users")]
