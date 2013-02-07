@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Cameras{% endblock %}
+
+{% block content %}
+
+<h3> Registered clients </h3>
+<br/>
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th> Title </th>
+        <th> Category </th>
+        <th> Vendor </th>
+        <th> Model </th>
+        <th> MGServer ID </th>
+    </tr>
+    </thead>
+    {% if clients %}
+    {% for client in clients %}
+    <tr>
+        <td> {{ client.name }} </td>
+        <td> {{ client.category }} </td>
+        <td> {{ client.vendor }} </td>
+        <td> {{ client.model }} </td>
+        <td> {{ client.mgserver_id }} </td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+</table>
+
+{% endblock %}

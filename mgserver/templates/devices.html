@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block body %}
+      <hr>
+
+<h2>Overview</h2>
+<br/>
+<p> All clients who wish to use the API will need to register and
+obtain a <em>client_key</em> as well as
+a <em>client_secret</em>. These credentials can then be used from
+other application.
+</p>
+
+{% if clients %}
+<h3> Registered clients </h3>
+<br/>
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th> Title </th>
+        <th> Category </th>
+        <th> Vendor </th>
+        <th> Model </th>
+        <th> MGServer ID </th>
+    </tr>
+    </thead>
+    {% for client in clients %}
+    <tr>
+        <td> {{ client.name }} </td>
+        <td> {{ client.category }} </td>
+        <td> {{ client.vendor }} </td>
+        <td> {{ client.model }} </td>
+        <td> {{ client.mgserver_id }} </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}

@@ -1,36 +1,35 @@
-{% extends "layout.html" %}
-{% block body %}
-<h2>Overview</h2>
-<br/>
-<p> All clients who wish to use the API will need to register and
-obtain a <em>client_key</em> as well as
-a <em>client_secret</em>. These credentials can then be used from
-other application.
-</p>
+{% extends "base.html" %}
 
-{% if clients %}
-<h3> Registered clients </h3>
-<br/>
-<table class="table table-striped">
-    <thead>
-        <tr>
-        <th> Title </th>
-        <th> Category </th>
-        <th> Vendor </th>
-        <th> Model </th>
-        <th> MGServer ID </th>
-    </tr>
-    </thead>
-    {% for client in clients %}
-    <tr>
-        <td> {{ client.name }} </td>
-        <td> {{ client.category }} </td>
-        <td> {{ client.vendor }} </td>
-        <td> {{ client.model }} </td>
-        <td> {{ client.mgserver_id }} </td>
-    </tr>
-    {% endfor %}
-</table>
-{% endif %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+      <div class="jumbotron">
+        <h1>Your gateway to IP cameras</h1>
+        <p class="lead">Lorem ipsum dolor sit amet, consectetur
+        adipisicing elit, sed do eiusmod tempor incididunt ut labore
+        et dolore magna aliqua.</p>
+        <a class="btn btn-large btn-success" href="{{ url_for('signup') }}">Sign up today</a>
+      </div>
+
+      <hr>
+
+      <div class="row-fluid marketing">
+        <div class="span6">
+          <h4>Simple</h4>
+          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+          <h4>Secure</h4>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        </div>
+
+        <div class="span6">
+          <h4>Efficient</h4>
+          <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+          <h4>Reliable</h4>
+          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
+        </div>
+      </div>
 
 {% endblock %}

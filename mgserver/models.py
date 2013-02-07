@@ -57,6 +57,18 @@ class ResourceOwner(Model):
     def __repr__(self):
         return "<ResourceOwner (%s, %s)>" % (self.name, self.email)
 
+    def is_authenticated(self):
+        return '_id' in self
+
+    def is_active(self):
+        return self.is_authenticated()
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return unicode(self['_id']) if ('_id' in self) else None
+
 
 class Client(Model):
     table = "clients"
@@ -70,7 +82,7 @@ class Client(Model):
         self.vendor = vendor
         self.model = model
 
-        self.mgserver_id = uuid.uuid1()
+        self.mgserver_id = uuid.uuid4()
         self.created_at = now
         self.updated_since = now
 

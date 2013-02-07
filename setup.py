@@ -24,6 +24,8 @@ setup(
         'Flask-Bcrypt',
         'flask-oauthprovider',
         'Flask-RESTful',
+        'Flask-WTF',
+        'flask-login',
         'pymongo',
         'pyotp',
     ]

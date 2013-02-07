@@ -10,7 +10,7 @@ app.config.update(
     MONGO_PORT = 27017,
     SECRET_KEY = "debugging key",
     DUMMY_EMAIL = "dummy@example.com",
-    DUMMY_PW_HASH = "dummyhash321",
+    DUMMY_PASSWORD = "dummyhash321",
     OTP_SECRET_KEY = "base32secret3232", # use pyotp.random_base32() to generate
     OTP_INTERVAL = 3600, # one hour?! this must match with client
 )
@@ -21,6 +21,7 @@ provider = ExampleProvider(app)
 # Imported to setup views
 import login
 import resource
+import ui
 
 @app.route('/callback')
 def callback():
