@@ -42,7 +42,7 @@ def get_valid_user(email, pw = ""):
 
 @app.before_request
 def before_request():
-    if not current_user.is_anonymous():
+    if current_user.is_authenticated():
         g.user = current_user
     else:
         g.user = None

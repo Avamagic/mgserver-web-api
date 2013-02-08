@@ -2,7 +2,7 @@ from mgserver import app
 from flask import render_template, g, redirect
 from models import Client
 from bson.objectid import ObjectId
-from flask.ext.login import login_required, current_user
+from flask.ext.login import login_required
 
 @app.route('/')
 def index():
