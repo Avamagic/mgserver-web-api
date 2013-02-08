@@ -4,6 +4,10 @@ from models import Client
 from bson.objectid import ObjectId
 from flask.ext.login import login_required
 
+@app.template_filter('datetimeformat')
+def datetimeformat(value, format='%Y-%d-%m %H:%M'):
+    return value.strftime(format)
+
 @app.route('/')
 def index():
     if g.user:

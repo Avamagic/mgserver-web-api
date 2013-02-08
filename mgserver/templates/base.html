@@ -33,20 +33,28 @@
           {% block custom_header_items %}
           {% if g.user %}
           <li{% if request.path == url_for('cameras') %} class="active"{% endif %}>
-            <a href="{{ url_for('cameras') }}">Cameras</a>
+            <a href="{{ url_for('cameras') }}"><i class="icon-facetime-video"></i> Cameras</a>
           </li>
-          <li{% if request.path == url_for('account') %} class="active"{% endif %}>
-            <a href="{{ url_for('account') }}">Account</a>
-          </li>
-          <li>
-            <a href="{{ url_for('logout') }}">Sign out</a>
+          <li class="dropdown{% if request.path == url_for('account') %} active{% endif %}">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{ g.user.name }} <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="{{ url_for('account') }}">Account</a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="{{ url_for('logout') }}">Sign out</a>
+              </li>
+            </ul>
           </li>
           {% else %}
           <li{% if request.path == url_for('index') %} class="active"{% endif %}>
-            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('index') }}"><i class="icon-home"></i> Home</a>
           </li>
-          <li>
-            <a href="{{ url_for('login') }}">Sign in</a>
+          <li{% if request.path == url_for('login') %} class="active"{% endif %}>
+            <a href="{{ url_for('login') }}"><i class="icon-user"></i> Sign in</a>
           </li>
           {% endif %}
           {% endblock custom_header_items %}

@@ -3,5 +3,14 @@
 {% block title %}Account{% endblock %}
 
 {% block content %}
-{{ g.user.name }}
+
+<dl class="dl-horizontal">
+  <dt>Name</dt>
+  <dd>{{ g.user.name }}</dd>
+  <dt>Email address</dt>
+  <dd>{{ g.user.email }}</dd>
+  <dt>Created at</dt>
+  <dd>{{ g.user.created_at|datetimeformat }}</dd>
+</dl>
+
 {% endblock %}
