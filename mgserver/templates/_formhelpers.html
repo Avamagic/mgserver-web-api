@@ -1,10 +1,14 @@
-{% macro render_field(field) %}
-        <div class="control-group{% if field.errors %} error{% endif %}">
-          <div class="controls">
-            {{ field(placeholder=field.label.text, **kwargs)|safe }}
-            {% if field.errors %}
-            <span class="help-block">{{ field.errors|first }}</span>
-            {% endif %}
+{%- macro render_field(field) -%}
+          <div class="control-group{% if field.errors %} error{% endif %}">
+            <div class="controls">
+              {{ field(placeholder=field.label.text, **kwargs)|safe }}
+              {%- if field.errors -%}
+              <span class="help-block">{{ field.errors|first }}</span>
+              {%- endif %}
+            </div>
           </div>
-        </div>
-{% endmacro %}
+{%- endmacro %}
+
+{% macro render_small_field(field) -%}
+          {{ field(placeholder=field.label.text, **kwargs)|safe }}
+{%- endmacro %}

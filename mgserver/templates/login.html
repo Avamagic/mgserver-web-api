@@ -5,21 +5,21 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% block content %}
-
       <form class="form-signin" action="" method="POST">
-        <h2 class="form-signin-heading">Please sign in</h2>
-        {% if error %}
-        <div class="control-group error">
-          <span class="help-block">{{ error }}</span>
-        </div>
-        {% endif %}
-        {{ render_field(form.email, class="input-block-level") }}
-        {{ render_field(form.password, class="input-block-level") }}
-        <label class="checkbox">
-          {{ form.remember()|safe }}{{ form.remember.label.text }}
-        </label>
-        {{ form.hidden_tag() }}
-        <button class="btn btn-primary" type="submit">Sign in</button>
+        <fieldset>
+          <legend>Please sign in</legend>
+          {%- if error -%}
+          <div class="control-group error">
+            <span class="help-block">{{ error }}</span>
+          </div>
+          {%- endif %}
+          {{ render_field(form.email, class="input-block-level") }}
+          {{ render_field(form.password, class="input-block-level") }}
+          <label class="checkbox">
+            {{ form.remember()|safe }}{{ form.remember.label.text }}
+          </label>
+          {{ form.hidden_tag() }}
+          <button class="btn btn-primary" type="submit">Sign in</button>
+        </fieldset>
       </form>
-
 {% endblock %}

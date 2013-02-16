@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Applications{% endblock %}
+
+{% from "_formhelpers.html" import render_small_field %}
+
+{% block content -%}
+      <h3>Add new application</h3>
+      <form class="form-inline" action="" method="POST">
+        <fieldset>
+          {{ render_small_field(form.name, class="input-medium") }}
+          {{ render_small_field(form.description, class="input-xlarge") }}
+          {{ form.hidden_tag() }}
+          <button class="btn btn-primary" type="submit">Add</button>
+        </fieldset>
+      </form>
+
+      <h3>Registered applications</h3>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Client key/secret</th>
+            <th>Created at</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if apps -%}
+          {%- for app in apps -%}
+          <tr>
+            <td>{{ app.name }}</td>
+            <td>{{ app.description }}</td>
+            <td><code>{{ app.client_key }}</code><br><code>{{ app.secret }}</code></td>
+            <td>{{ app.created_at|datetimeformat }}</td>
+          </tr>
+          {% endfor -%}
+          {%- endif %}
+        </tbody>
+      </table>
+{%- endblock %}

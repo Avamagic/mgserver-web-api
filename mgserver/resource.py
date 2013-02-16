@@ -1,7 +1,6 @@
-from mgserver import app
+from mgserver import app, provider
 from flask import flash, render_template, g, session, request
 from models import ResourceOwner, Client, AccessToken
-from provider import ExampleProvider
 from bson.objectid import ObjectId
 from flask.ext import restful
 from flask.ext.restful import reqparse, fields, marshal_with, abort, marshal
@@ -12,7 +11,6 @@ import utils
 
 bcrypt = Bcrypt(app)
 api = restful.Api(app)
-provider = ExampleProvider(app)
 
 parser = reqparse.RequestParser()
 parser.add_argument('otp', type=int)

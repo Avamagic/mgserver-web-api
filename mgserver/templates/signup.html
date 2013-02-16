@@ -6,17 +6,19 @@
 
 {% block content %}
       <form class="form-signin" action="" method="POST">
-        <h2 class="form-signin-heading">Please sign up</h2>
-        {% if error %}
-        <div class="control-group error">
-          <span class="help-block">{{ error }}</span>
-        </div>
-        {% endif %}
-        {{ render_field(form.name, class="input-block-level") }}
-        {{ render_field(form.email, class="input-block-level") }}
-        {{ render_field(form.password, class="input-block-level") }}
-        {{ render_field(form.confirm, class="input-block-level") }}
-        {{ form.hidden_tag() }}
-        <button class="btn btn-primary" type="submit">Sign up</button>
+        <fieldset>
+          <legend>Please sign up</legend>
+          {%- if error %}
+          <div class="control-group error">
+            <span class="help-block">{{ error }}</span>
+          </div>
+          {% endif %}
+          {{ render_field(form.name, class="input-block-level") }}
+          {{ render_field(form.email, class="input-block-level") }}
+          {{ render_field(form.password, class="input-block-level") }}
+          {{ render_field(form.confirm, class="input-block-level") }}
+          {{ form.hidden_tag() }}
+          <button class="btn btn-primary" type="submit">Sign up</button>
+        </fieldset>
       </form>
 {% endblock %}

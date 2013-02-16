@@ -31,6 +31,10 @@ class Model(dict):
     def save(cls, obj):
         return cls.get_collection().save(obj)
 
+    @classmethod
+    def ensure_index(cls, key_or_list):
+        return cls.get_collection().ensure_index(key_or_list)
+
     def __getattr__(self, attr):
         return self[attr]
 
@@ -95,6 +99,25 @@ class Client(Model):
 
     def __repr__(self):
         return "<Client (%s, %s)>" % (self.name, self.id)
+
+
+class App(Model):
+    table = "apps"
+
+    def __init__(self, name, description, client_key, secret, resource_owner_id):
+        now = datetime.utcnow()
+
+        self.name = name
+        self.description = description
+        self.client_key = client_key
+        self.secret = secret
+        self.resource_owner_id = resource_owner_id
+
+        self.created_at = now
+        self.updated_since = now
+
+    def __repr__(self):
+        return "<App (%s, %s)>" % (self.name, self.id)
 
 
 class Nonce(Model):
