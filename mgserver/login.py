@@ -78,7 +78,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash(u'You have been signed out')
+    flash(u'You have been signed out.')
     return redirect(url_for('index'))
 
 
@@ -113,6 +113,11 @@ def create_user(email, passwd="", name=""):
     user = User(**user_dict)
     user_id = User.insert(user)
 
+    user_dict = User.find_one({"_id": user_id})
+    user = User()
+    user.update(user_dict)
+    return user
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -124,7 +129,9 @@ def signup():
     error = None
     if form.validate_on_submit():
         try:
-            create_user(form.email.data, form.password.data, form.name.data)
+            user = create_user(form.email.data, form.password.data, form.name.data)
+            login_user(user)
+            flash("Created account successfully.")
             return form.redirect('index')
         except SignupException as e:
             error = e.value

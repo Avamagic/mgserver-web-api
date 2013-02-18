@@ -1,4 +1,4 @@
-from flask import request, render_template, g
+from flask import request, render_template, g, url_for, redirect
 from flask.ext.oauthprovider import OAuthProvider
 from bson.objectid import ObjectId
 from models import ResourceOwner as User, Client, Nonce
@@ -50,12 +50,21 @@ class ExampleProvider(OAuthProvider):
             next_url = url_for("login") + "?next=" + request.url
             return redirect(next_url)
 
-        if request.method == u"POST":
+        if request.method == "POST":
             token = request.form.get("oauth_token")
             return self.authorized(token)
         else:
-            token = request.args.get(u"oauth_token")
-            return render_template(u"authorize.html", token=token)
+            token = request.args.get("oauth_token")
+            try:
+                requestToken = RequestToken.find_one({"token": token})
+                client = Client.find_one({"_id": requestToken["client_id"]})
+                client_name = client["name"]
+            except:
+                client_name = ""
+
+            return render_template("authorize.html",
+                                   token=token,
+                                   client_name=client_name)
 
     def validate_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None):

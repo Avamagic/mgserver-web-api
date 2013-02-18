@@ -1,4 +1,16 @@
-<form method="POST" action="/authorize">
-    <input type="hidden" name="oauth_token" value="{{ token }}"/>
-    <input type="submit" name="authorized" value="Authorize"/>
-</form>
+{% extends "base.html" %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block content %}
+      <h3>Please confirm</h3>
+
+      <p><strong>{{ client_name }}</strong> wants your authorization to access your account.</p>
+
+      <form method="POST" action="{{ url_for("authorize") }}">
+        <fieldset>
+          <input type="hidden" name="oauth_token" value="{{ token }}"/>
+          <button class="btn btn-primary" name="authorized" type="submit">Authorize</button>
+        </fieldset>
+      </form>
+{% endblock %}

@@ -51,12 +51,14 @@ class ResourceOwner(Model):
         self.name = name
         self.email = email
         self.pw_hash = pw_hash
+
         self.created_at = now
         self.updated_since = now
 
         self.request_tokens = []
         self.access_tokens = []
         self.client_ids = []
+        self.device_ids = []
 
     def __repr__(self):
         return "<ResourceOwner (%s, %s)>" % (self.name, self.email)
@@ -77,16 +79,12 @@ class ResourceOwner(Model):
 class Client(Model):
     table = "clients"
 
-    def __init__(self, client_key, secret, resource_owner_id, name="", description="", category="", vendor="", model=""):
+    def __init__(self, client_key, secret, callbacks, resource_owner_id, name, description):
         now = datetime.utcnow()
 
         self.name = name
         self.description = description
-        self.category = category
-        self.vendor = vendor
-        self.model = model
 
-        self.mgserver_id = uuid.uuid4()
         self.created_at = now
         self.updated_since = now
 
@@ -94,30 +92,37 @@ class Client(Model):
         self.secret = secret
         self.request_tokens = []
         self.access_tokens = []
-        self.callbacks = []
+        self.callbacks = callbacks
         self.resource_owner_id = resource_owner_id
 
     def __repr__(self):
         return "<Client (%s, %s)>" % (self.name, self.id)
 
 
-class App(Model):
-    table = "apps"
+class Device(Model):
+    table = "devices"
 
-    def __init__(self, name, description, client_key, secret, resource_owner_id):
+    def __init__(self,
+                 resource_owner_id, client_id,
+                 vendor, model,
+                 features=[],
+                 name="", description=""):
         now = datetime.utcnow()
 
         self.name = name
         self.description = description
-        self.client_key = client_key
-        self.secret = secret
+        self.vendor = vendor
+        self.model = model
+        self.features = []
         self.resource_owner_id = resource_owner_id
+        self.client_id = client_id
 
+        self.mgserver_id = uuid.uuid4()
         self.created_at = now
         self.updated_since = now
 
     def __repr__(self):
-        return "<App (%s, %s)>" % (self.name, self.id)
+        return "<Device (%s, %s)>" % (self.name, self.id)
 
 
 class Nonce(Model):

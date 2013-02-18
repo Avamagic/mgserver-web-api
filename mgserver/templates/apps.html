@@ -10,6 +10,7 @@
         <fieldset>
           {{ render_small_field(form.name, class="input-medium") }}
           {{ render_small_field(form.description, class="input-xlarge") }}
+          {{ render_small_field(form.callback, class="input-xlarge") }}
           {{ form.hidden_tag() }}
           <button class="btn btn-primary" type="submit">Add</button>
         </fieldset>
@@ -21,18 +22,27 @@
           <tr>
             <th>Name</th>
             <th>Description</th>
+            <th>Callbacks</th>
             <th>Client key/secret</th>
             <th>Created at</th>
           </tr>
         </thead>
         <tbody>
-          {% if apps -%}
-          {%- for app in apps -%}
+          {% if clients -%}
+          {%- for client in clients -%}
           <tr>
-            <td>{{ app.name }}</td>
-            <td>{{ app.description }}</td>
-            <td><code>{{ app.client_key }}</code><br><code>{{ app.secret }}</code></td>
-            <td>{{ app.created_at|datetimeformat }}</td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.description }}</td>
+            <td>
+              {% for callback in client.callbacks -%}
+              <code>{{ callback }}</code>{% if not loop.last %}<br>{% endif %}
+              {%- endfor %}
+            </td>
+            <td>
+              <code>{{ client.client_key }}</code><br>
+              <code>{{ client.secret }}</code>
+            </td>
+            <td>{{ client.created_at|datetimeformat }}</td>
           </tr>
           {% endfor -%}
           {%- endif %}
