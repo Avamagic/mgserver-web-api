@@ -1,24 +1,19 @@
-MGServer Web API
-----------------
+# MGServer Web API
 
 Web application that exports RESTful API for MGServer.
 
-Installation
-============
+## Installation
 
-Use virtualenv.
+Please refer to [Install][] for detail.
 
-You can install the latest development snapshot like so:
+[Install]: https://github.com/Avamagic/mgserver-web-api/wiki/Install
 
-    git clone git@github.com:Avamagic/mgserver-web-api
-    cd mgserver-web-api
-    python setup.py install
+## Development
 
-Development
-===========
+Source code is hosted on [GitHub][] .
 
-Source code is hosted on `GitHub <https://github.com/Avamagic/mgserver-web-api>`.
+    $ git clone git@github.com:Avamagic/mgserver-web-api
+    $ cd mgserver-web-api
+    $ python setup.py develop
 
-    git clone git@github.com:Avamagic/mgserver-web-api
-    cd mgserver-web-api
-    python setup.py develop
+[GitHub]: https://github.com/Avamagic/mgserver-web-api
