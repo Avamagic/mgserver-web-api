@@ -1,34 +1,13 @@
-from functools import wraps
-from flask import g, url_for, request, redirect
-import datetime, time
-from flask.ext.restful import fields
-from urlparse import urlparse, urljoin
-from flask.ext.wtf import Form, TextField, HiddenField
+from flask.ext.wtf import Form
+from flask.ext.wtf import HiddenField, BooleanField, TextField, PasswordField
+from flask.ext.wtf import Required, Length, EqualTo, Email
 
-
-def require_logged_in(f):
-    """Require user to be logged in."""
-    @wraps(f)
-    def decorator(*args, **kwargs):
-        if g.user is None:
-            next_url = url_for("login") + "?next=" + request.url
-            return redirect(next_url)
-        else:
-            return f(*args, **kwargs)
-    return decorator
-
-class Epoch(fields.Raw):
-    """Return a Unix time-formatted datetime string in UTC"""
-    def format(self, value):
-        try:
-            return int(time.mktime(value.utctimetuple()))
-        except AttributeError as ae:
-            raise fields.MarshallingException(ae)
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
+
 
 def get_redirect_target():
     for target in request.args.get('next'), request.referrer:
@@ -36,6 +15,7 @@ def get_redirect_target():
             continue
         if is_safe_url(target):
             return target
+
 
 class RedirectForm(Form):
     next = HiddenField()
@@ -50,3 +30,25 @@ class RedirectForm(Form):
             return redirect(self.next.data)
         target = get_redirect_target()
         return redirect(target or url_for(endpoint, **values))
+
+
+class LoginForm(RedirectForm):
+    email = TextField('Email address', [Required(), Email()])
+    password = PasswordField('Password', [Required()])
+    remember = BooleanField('Remember me')
+
+
+class SignupForm(RedirectForm):
+    name = TextField('Name', [Required()])
+    email = TextField('Email address', [Email()])
+    password = PasswordField('Password', [
+            Required(),
+            EqualTo('confirm', message='Passwords must match')
+            ])
+    confirm = PasswordField('Repeat password')
+
+
+class ClientForm(Form):
+    name = TextField('Name', [Required()])
+    description = TextField('Description')
+    callback = TextField('Callback', [Required(), URL(require_tld=False)])

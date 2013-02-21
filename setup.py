@@ -22,11 +22,15 @@ setup(
     install_requires=[
         'Flask',
         'Flask-Bcrypt',
-        'flask-oauthprovider',
+        'flask-OAuthProvider',
         'Flask-RESTful',
         'Flask-WTF',
-        'flask-login',
+        'flask-Login',
+        'Flask-Script',
+        'Flask-Babel',
+        'Flask-Testing',
         'pymongo',
         'pyotp',
+        'nose',
     ]
 )

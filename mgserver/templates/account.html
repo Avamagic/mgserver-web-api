@@ -6,10 +6,10 @@
       <h3>Account info</h3>
       <dl class="dl-horizontal">
         <dt>Name</dt>
-        <dd>{{ g.user.name }}</dd>
+        <dd>{{ current_user.name }}</dd>
         <dt>Email address</dt>
-        <dd>{{ g.user.email }}</dd>
+        <dd>{{ current_user.email }}</dd>
         <dt>Created at</dt>
-        <dd>{{ g.user.created_at|datetimeformat }}</dd>
+        <dd>{{ current_user.created_at|datetimeformat }}</dd>
       </dl>
 {% endblock -%}

@@ -1,11 +1,12 @@
+from flask import current_app
 import pymongo
 from datetime import datetime
 import uuid
 
 
 def get_db():
-    from mgserver import app
-    connection = pymongo.MongoClient(app.config['MONGO_HOST'], app.config['MONGO_PORT'])
+    connection = pymongo.MongoClient(current_app.config['MONGO_HOST'],
+                                     current_app.config['MONGO_PORT'])
     return connection.mgserver_oauth_provider
 
 

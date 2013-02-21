@@ -1,12 +1,12 @@
 from flask import request, render_template, g, url_for, redirect
 from flask.ext.oauthprovider import OAuthProvider
+from flask.ext.login import current_user
 from bson.objectid import ObjectId
 from models import ResourceOwner as User, Client, Nonce
 from models import RequestToken, AccessToken
-from utils import require_logged_in
 
 
-class ExampleProvider(OAuthProvider):
+class MongoProvider(OAuthProvider):
 
     @property
     def request_token_url(self):
@@ -41,13 +41,13 @@ class ExampleProvider(OAuthProvider):
         uid = request.values.get('uid')
         user = User.find_one({"_id": ObjectId(uid)}) if uid else None
         if (user is not None and user["email"] == "" and user["pw_hash"] == ""):
-            g.user = user
+            g.hack_user = user
             token = request.values.get("oauth_token")
             return self.authorized(token)
 
         # Check logged in
-        if g.user is None:
-            next_url = url_for("login") + "?next=" + request.url
+        if not current_user.is_authenticated():
+            next_url = url_for("frontend.login") + "?next=" + request.url
             return redirect(next_url)
 
         if request.method == "POST":
@@ -288,7 +288,11 @@ class ExampleProvider(OAuthProvider):
             Nonce.insert(nonce)
 
     def save_verifier(self, request_token, verifier):
-        token = RequestToken.find_one({'token':request_token})
+        token = RequestToken.find_one({'token': request_token})
         token['verifier'] = verifier
-        token['resource_owner_id'] = g.user['_id']
+        if hasattr(g, 'hack_user'):
+            user, g.hack_user = g.hack_user, None
+        else:
+            user = current_user
+        token['resource_owner_id'] = user['_id']
         RequestToken.get_collection().save(token)
