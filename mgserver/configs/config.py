@@ -16,14 +16,15 @@ class BaseConfig(object):
     # os.urandom(24)
     SECRET_KEY = 'secret key'
 
-    MONGO_HOST = "localhost",
-    MONGO_PORT = 27017,
+    MONGO_HOST = "localhost"
+    MONGO_PORT = 27017
+    MONGO_DATABASE = "mgserver_oauth_provider"
 
-    DUMMY_EMAIL = "dummy@example.com",
-    DUMMY_PASSWORD = "dummyhash321",
+    DUMMY_EMAIL = "dummy@example.com"
+    DUMMY_PASSWORD = "dummyhash321"
 
-    OTP_SECRET_KEY = "base32secret3232", # use pyotp.random_base32() to generate
-    OTP_INTERVAL = 3600, # one hour?! this must match with client
+    OTP_SECRET_KEY = "base32secret3232" # use pyotp.random_base32() to generate
+    OTP_INTERVAL = 3600 # one hour?! this must match with client
 
 
 class DevConfig(BaseConfig):
@@ -61,3 +62,5 @@ class TestConfig(BaseConfig):
     TESTING = True
 
     CSRF_ENABLED = False
+
+    MONGO_DATABASE = "mgserver_unittest"

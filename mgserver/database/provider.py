@@ -2,8 +2,8 @@ from flask import request, render_template, g, url_for, redirect
 from flask.ext.oauthprovider import OAuthProvider
 from flask.ext.login import current_user
 from bson.objectid import ObjectId
-from models import ResourceOwner as User, Client, Nonce
-from models import RequestToken, AccessToken
+from .models import ResourceOwner as User, Client, Nonce
+from .models import RequestToken, AccessToken
 
 
 class MongoProvider(OAuthProvider):

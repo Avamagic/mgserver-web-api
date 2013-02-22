@@ -1,10 +1,11 @@
-from flask import Blueprint, request, abort, MethodView, jsonify
+from flask import Blueprint, request, abort, jsonify
+from flask.views import MethodView
 from flask.ext.restful import marshal
 from bson.objectid import ObjectId
 from datetime import datetime
 import pyotp
 from ..extensions import bcrypt, provider
-from ..database.models import ResourceOwner as User, Client, Device
+from ..database import ResourceOwner as User, Client, Device
 from .utils import (parser, user_fields, device_fields,
                     get_user_or_abort, get_client_or_abort,
                     abort_json)

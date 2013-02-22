@@ -7,7 +7,7 @@ import uuid
 def get_db():
     connection = pymongo.MongoClient(current_app.config['MONGO_HOST'],
                                      current_app.config['MONGO_PORT'])
-    return connection.mgserver_oauth_provider
+    return connection[current_app.config['MONGO_DATABASE']]
 
 
 class Model(dict):

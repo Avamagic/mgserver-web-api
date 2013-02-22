@@ -1,17 +1,10 @@
-"""
-    Unit Tests
-    ~~~~~~~~~~
-
-    Define TestCase as base class for unit tests.
-    Ref: http://packages.python.org/Flask-Testing/
-"""
-
-from flask.ext.testing import TestCase as Base, Twill
-
-from fbone import create_app
-from fbone.user import User, UserDetail, ADMIN, USER, ACTIVE
-from fbone.configs import TestConfig
-from fbone.extensions import db
+from flask import url_for
+from flask.ext.testing import TestCase as Base
+from mgserver import create_app
+from mgserver.database import ResourceOwner as User, Client, Device
+from mgserver.database import get_db
+from mgserver.configs import TestConfig
+from mgserver.extensions import provider, bcrypt
 
 
 class TestCase(Base):
@@ -19,70 +12,44 @@ class TestCase(Base):
 
     def create_app(self):
         """Create and return a testing flask app."""
-
         app = create_app(TestConfig)
-        self.twill = Twill(app, port=3000)
         return app
 
     def init_data(self):
-
-        demo = User(name=u'demo',
-                email=u'demo@example.com',
-                password=u'123456',
-                role_id=USER,
-                status_id=ACTIVE,
-                user_detail=UserDetail(
-                    age=10,
-                    url=u'http://demo.example.com',
-                    deposit=100.00,
-                    location=u'Hangzhou',
-                    bio=u'Demo Guy is ... hmm ... just a demo guy.',
-                    ),
-                )
-        admin = User(name=u'admin',
-                email=u'admin@example.com',
-                password=u'123456',
-                role_id=ADMIN,
-                status_id=ACTIVE,
-                user_detail=UserDetail(
-                    age=10,
-                    url=u'http://admin.example.com',
-                    deposit=100.00,
-                    location=u'Hangzhou',
-                    bio=u'admin Guy is ... hmm ... just a admin guy.',
-                    ),
-                )
-        db.session.add(demo)
-        db.session.add(admin)
-        db.session.commit()
+        user_dict = {
+            u"name": "Known User",
+            u"email": "known_user@example.com",
+            u"pw_hash": bcrypt.generate_password_hash("9527"),
+            }
+        user = User(**user_dict)
+        User.insert(user)
 
     def setUp(self):
         """Reset all tables before testing."""
-
-        db.create_all()
         self.init_data()
 
     def tearDown(self):
-        """Clean db session and drop all tables."""
+        """Drop all collections."""
+        db = get_db()
+        for name in db.collection_names():
+            if not name.startswith("system."):
+                db.drop_collection(name)
 
-        db.session.remove()
-        db.drop_all()
-
-    def login(self, username, password):
+    def login(self, email, password):
         data = {
-            'login': username,
-            'password': password,
+            "email": email,
+            "password": password,
         }
         response = self.client.post('/login', data=data, follow_redirects=True)
         return response
 
     def _logout(self):
         response = self.client.get('/logout')
-        self.assertRedirects(response, location='/')
+        self.assert_redirects(response, location=url_for('frontend.index'))
 
     def _test_get_request(self, endpoint, template=None):
         response = self.client.get(endpoint)
         self.assert_200(response)
         if template:
-            self.assertTemplateUsed(name=template)
+            self.assert_template_used(name=template)
         return response

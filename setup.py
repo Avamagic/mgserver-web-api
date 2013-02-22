@@ -32,5 +32,6 @@ setup(
         'pymongo',
         'pyotp',
         'nose',
+        'blinker',
     ]
 )

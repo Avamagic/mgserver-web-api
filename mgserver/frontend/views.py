@@ -13,7 +13,7 @@ frontend = Blueprint('frontend', __name__)
 @frontend.route('/')
 def index():
     if current_user.is_authenticated():
-        return redirect('devices')
+        return redirect(url_for('frontend.devices'))
     else:
         return render_template('index.html')
 
@@ -44,7 +44,7 @@ def apps():
                           form.callback.data)
         except CreateClientException as e:
             flash("{}".format(e))
-        return redirect('apps')
+        return redirect(url_for('frontend.apps'))
 
     clients = Client.find({"resource_owner_id": current_user["_id"]}).sort("created_at", -1)
     return render_template('apps.html', clients=clients, form=form)
@@ -54,7 +54,7 @@ def apps():
 def login():
     # if we are already logged in
     if current_user.is_authenticated():
-        return redirect(url_for('index'))
+        return redirect(url_for('frontend.index'))
 
     form = LoginForm()
     error = None
@@ -63,7 +63,7 @@ def login():
         if user:
             login_user(user, remember=form.remember.data)
             flash('Signed in successfully.')
-            return form.redirect('index')
+            return form.redirect('frontend.index')
         else:
             error = "Invalid credentials"
 
@@ -75,14 +75,14 @@ def login():
 def logout():
     logout_user()
     flash(u'You have been signed out.')
-    return redirect(url_for('index'))
+    return redirect(url_for('frontend.index'))
 
 
 @frontend.route('/signup', methods=['GET', 'POST'])
 def signup():
     # if we are already logged in
     if current_user.is_authenticated():
-        return redirect(url_for('index'))
+        return redirect(url_for('frontend.index'))
 
     form = SignupForm()
     error = None
@@ -91,7 +91,7 @@ def signup():
             user = create_user(form.email.data, form.password.data, form.name.data)
             login_user(user)
             flash("Created account successfully.")
-            return form.redirect('index')
+            return form.redirect('frontend.index')
         except SignupException as e:
             error = e.value
 

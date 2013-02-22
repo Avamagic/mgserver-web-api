@@ -1,6 +1,8 @@
+from urlparse import urlparse, urljoin
+from flask import request, redirect
 from flask.ext.wtf import Form
 from flask.ext.wtf import HiddenField, BooleanField, TextField, PasswordField
-from flask.ext.wtf import Required, Length, EqualTo, Email
+from flask.ext.wtf import Required, Length, EqualTo, Email, URL
 
 
 def is_safe_url(target):

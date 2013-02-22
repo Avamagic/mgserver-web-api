@@ -1,7 +1,7 @@
 from flask import current_app
 from flask.ext.login import current_user
 from ..extensions import provider, bcrypt
-from ..database.models import ResourceOwner as User, Client
+from ..database import ResourceOwner as User, Client
 from .exceptions import CreateClientException, SignupException
 
 
@@ -25,7 +25,7 @@ def create_user(email, passwd="", name=""):
 
 
 def get_valid_user(email, pw = ""):
-    """Return instance of models.ResourceOwner if credentials are valid
+    """Return instance of ResourceOwner if credentials are valid
     """
     pw_hash = bcrypt.generate_password_hash(current_app.config['DUMMY_PASSWORD'])
     user_dict = User.find_one({'email': email})

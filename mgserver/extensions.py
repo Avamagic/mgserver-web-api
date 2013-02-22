@@ -1,5 +1,5 @@
-from .database.provider import MongoProvider
-provider = MongoProvider()
+from .database import MongoProvider
+provider = MongoProvider(None)
 
 from flask.ext.login import LoginManager
 login_manager = LoginManager()
