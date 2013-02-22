@@ -33,5 +33,6 @@ setup(
         'pyotp',
         'nose',
         'blinker',
+        'coverage'
     ]
 )

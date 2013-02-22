@@ -10,10 +10,18 @@ Please refer to [Install][] for detail.
 
 ## Development
 
-Source code is hosted on [GitHub][] .
+### Prepare environment
 
     $ git clone git@github.com:Avamagic/mgserver-web-api
     $ cd mgserver-web-api
-    $ python setup.py develop
+    $ virtualenv venv
+    $ source venv/bin/activate
+    $ pip install -r requirements.txt
 
-[GitHub]: https://github.com/Avamagic/mgserver-web-api
+### Run on local machine
+
+    $ python manager.py runserver
+
+### Unit test
+
+    $ nosetests --with-coverage --cover-package=mgserver
