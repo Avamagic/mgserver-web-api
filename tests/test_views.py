@@ -1,7 +1,7 @@
 from werkzeug.urls import url_quote
 from flask import url_for
 from mgserver.extensions import provider
-from mgserver.database import ResourceOwner as User
+from mgserver.database import ResourceOwner as User, Client
 from tests import TestCase
 
 
@@ -18,6 +18,47 @@ class TestFrontend(TestCase):
 
         response = self.client.get('/', follow_redirects=True)
         self.assert_template_used(name='devices.html')
+
+    def test_add_app(self):
+        self.login("known_user@example.com", "9527")
+
+        data = {
+            u"name": "Fake app",
+            u"description": "Official fake app for MGServer",
+            u"callback": "xxx://yyy.zzz",
+            }
+        response = self.client.post('/apps', data=data)
+
+        app = Client.find_one({u"name": data["name"]})
+        assert app is not None
+
+        self.assert_redirects(response, location=url_for("frontend.apps"))
+
+    def test_add_app_empty_name(self):
+        self.login("known_user@example.com", "9527")
+
+        data = {
+            u"name": "",
+            u"description": "Official fake app for MGServer",
+            u"callback": "xxx://yyy.zzz",
+            }
+        response = self.client.post('/apps', data=data)
+
+        app = Client.find_one({u"name": data["name"]})
+        assert app is None
+
+    def test_add_app_invalid_callback(self):
+        self.login("known_user@example.com", "9527")
+
+        data = {
+            u"name": "Fake app",
+            u"description": "Official fake app for MGServer",
+            u"callback": "xxx:/yyy.zzz",
+            }
+        response = self.client.post('/apps', data=data)
+
+        app = Client.find_one({u"name": data["name"]})
+        assert app is None
 
     def test_signup(self):
         self._test_get_request('/signup', 'signup.html')
