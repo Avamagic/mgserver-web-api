@@ -4,7 +4,7 @@ from flask.ext.restful import marshal
 from bson.objectid import ObjectId
 from datetime import datetime
 import pyotp
-from ..extensions import bcrypt, provider
+from ..extensions import bcrypt, provider, totp
 from ..database import ResourceOwner as User, Client, Device
 from .utils import (parser, user_fields, device_fields,
                     get_user_or_abort, get_client_or_abort,
@@ -20,8 +20,6 @@ class Seed(MethodView):
         """Register a new user account."""
         args = parser.parse_args()
 
-        totp = pyotp.TOTP(current_app.config["OTP_SECRET_KEY"],
-                          interval=current_app.config["OTP_INTERVAL"])
         if not totp.verify(args["otp"]):
             abort_json(400,
                        flag="fail",

@@ -7,7 +7,7 @@ from bson.objectid import ObjectId
 from .configs import DevConfig
 from .frontend import frontend
 from .api import api
-from .extensions import provider, login_manager, bcrypt
+from .extensions import provider, login_manager, bcrypt, totp
 from .database import ResourceOwner as User
 
 
@@ -83,6 +83,9 @@ def configure_extensions(app):
             return None
 
     login_manager.setup_app(app)
+
+    # our own totp
+    totp.init_app(app)
 
 
 def configure_template_filters(app):
