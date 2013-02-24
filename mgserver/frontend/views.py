@@ -39,7 +39,8 @@ def apps():
     form = ClientForm()
     if form.validate_on_submit():
         try:
-            create_client(form.name.data,
+            create_client(current_user["_id"],
+                          form.name.data,
                           form.description.data,
                           form.callback.data)
         except CreateClientException as e:

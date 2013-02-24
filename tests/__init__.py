@@ -1,10 +1,9 @@
 from flask import url_for
 from flask.ext.testing import TestCase as Base
 from mgserver import create_app
-from mgserver.database import ResourceOwner as User, Client, Device
 from mgserver.database import get_db
 from mgserver.configs import TestConfig
-from mgserver.extensions import provider, bcrypt
+from mgserver.frontend.utils import create_user, create_client
 
 
 class TestCase(Base):
@@ -16,13 +15,18 @@ class TestCase(Base):
         return app
 
     def init_data(self):
-        user_dict = {
-            u"name": "Known User",
-            u"email": "known_user@example.com",
-            u"pw_hash": bcrypt.generate_password_hash("9527"),
-            }
-        user = User(**user_dict)
-        User.insert(user)
+        user = create_user(
+            "known_user@example.com",
+            "9527",
+            "Known User"
+            )
+
+        client = create_client(
+            user["_id"],
+            "Known app",
+            "Official known app for testing",
+            "known://fake/app"
+            )
 
     def setUp(self):
         """Reset all tables before testing."""
@@ -35,12 +39,14 @@ class TestCase(Base):
             if not name.startswith("system."):
                 db.drop_collection(name)
 
-    def login(self, email, password):
+    def login(self, email, password, follow_redirects=True):
         data = {
             "email": email,
             "password": password,
-        }
-        response = self.client.post('/login', data=data, follow_redirects=True)
+            }
+        response = self.client.post('/login',
+                                    data=data,
+                                    follow_redirects=follow_redirects)
         return response
 
     def _logout(self):

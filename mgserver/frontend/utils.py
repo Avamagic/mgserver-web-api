@@ -1,5 +1,4 @@
 from flask import current_app
-from flask.ext.login import current_user
 from ..extensions import provider, bcrypt
 from ..database import ResourceOwner as User, Client
 from .exceptions import CreateClientException, SignupException
@@ -7,8 +6,11 @@ from .exceptions import CreateClientException, SignupException
 
 def create_user(email, passwd="", name=""):
     user = User.find_one({'email': email})
+    print user
     if user:
         raise SignupException('This email address is already signed up')
+
+    User.ensure_index("email")
 
     user_dict = {
         u"email": email,
@@ -16,11 +18,7 @@ def create_user(email, passwd="", name=""):
         u"name": name,
         }
     user = User(**user_dict)
-    user_id = User.insert(user)
-
-    user_dict = User.find_one({"_id": user_id})
-    user = User()
-    user.update(user_dict)
+    User.insert(user)
     return user
 
 
@@ -40,22 +38,24 @@ def get_valid_user(email, pw = ""):
         return None
 
 
-def create_client(name, description, callback):
-    client = Client.find_one({"resource_owner_id": current_user["_id"], "name": name})
+def create_client(user_id, name, description, callback):
+    client = Client.find_one({"resource_owner_id": user_id, "name": name})
     if client:
         raise CreateClientException(name)
 
     Client.ensure_index([("resource_owner_id", 1), ("created_at", -1)])
     Client.ensure_index([("resource_owner_id", 1), ("name", 1)])
     Client.ensure_index("client_key")
+    Client.ensure_index("name")
 
     client_dict = {
         u"name": name,
         u"description": description,
         u"client_key": provider.generate_client_key(),
         u"secret": provider.generate_client_secret(),
-        u"resource_owner_id": current_user["_id"],
+        u"resource_owner_id": user_id,
         u"callbacks": [callback,],
         }
     client = Client(**client_dict)
-    client_id = Client.insert(client)
+    Client.insert(client)
+    return client
