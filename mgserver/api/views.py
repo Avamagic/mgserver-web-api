@@ -1,4 +1,5 @@
 from flask import Blueprint, request, abort, jsonify
+from flask import make_response, json
 from flask.views import MethodView
 from flask.ext.restful import marshal
 from bson.objectid import ObjectId
@@ -7,11 +8,22 @@ import pyotp
 from ..extensions import bcrypt, provider, totp
 from ..database import ResourceOwner as User, Client, Device
 from .utils import (parser, user_fields, device_fields,
-                    get_user_or_abort, get_client_or_abort,
-                    abort_json)
+                    get_user_or_abort, get_client_or_abort)
+from .exceptions import ApiException
 
 
 api = Blueprint("api", __name__)
+
+
+@api.errorhandler(ApiException)
+def handle_api_exception(error):
+    data = {
+        "flag": "fail",
+        "msg": error.msg,
+        }
+    resp = make_response(json.dumps(data), error.code)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
 
 
 class Seed(MethodView):
@@ -21,12 +33,18 @@ class Seed(MethodView):
         args = parser.parse_args()
 
         if not totp.verify(args["otp"]):
-            abort_json(400,
-                       flag="fail",
-                       msg="OTP incorrect, expect {}, got {}".format(totp.now(), args["otp"]))
+            raise ApiException(
+                code=400,
+                msg="OTP incorrect, expect {}, got {}".format(totp.now(), args["otp"]),
+                )
 
         # gather user, client and device
         client = Client.find_one({"client_key": args["consumer_key"]})
+        if not client:
+            raise ApiException(
+                code=400,
+                msg="Client key not found: {}".format(args["consumer_key"]),
+                )
 
         user = User()
         user.client_ids.append(client["_id"])
@@ -115,9 +133,10 @@ class DeviceRes(MethodView):
     def get(self, device_id):
         device = Device.find_one({'_id': ObjectId(device_id)})
         if not device:
-            abort_json(404,
-                       flag="fail",
-                       msg="Device {} doesn't exist".format(device_id))
+            raise ApiException(
+                code=404,
+                msg="Device {} doesn't exist".format(device_id),
+                )
         return jsonify({
                 "flag": "success",
                 "res": marshal(device, device_fields),

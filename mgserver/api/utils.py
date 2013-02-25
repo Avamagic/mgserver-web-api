@@ -3,6 +3,7 @@ from werkzeug.exceptions import HTTPException
 from flask import json, make_response, request, abort
 from flask.ext.restful import reqparse, fields
 from ..database import ResourceOwner as User, Client, AccessToken
+from .exceptions import ApiException
 
 
 parser = reqparse.RequestParser()
@@ -14,14 +15,6 @@ parser.add_argument("description", type=str)
 parser.add_argument("vendor", type=str)
 parser.add_argument("model", type=str)
 parser.add_argument("consumer_key", type=str)
-
-
-def abort_json(code, **kwargs):
-    try:
-        abort(code)
-    except HTTPException as e:
-        e.data = kwargs
-        raise e
 
 
 class Epoch(fields.Raw):
@@ -60,9 +53,10 @@ def get_user_or_abort():
     access_token = request.oauth.resource_owner_key
     token = AccessToken.find_one({'token': access_token})
     if not token:
-        abort_json(401,
-                   flag="fail",
-                   msg="Access token doesn't associate with any user")
+        raise ApiException(
+            code=401,
+            msg="Access token doesn't associate with any user",
+            )
     user_dict = User.find_one({'_id': token['resource_owner_id']})
     user = User()
     user.update(user_dict)
@@ -73,12 +67,14 @@ def get_client_or_abort():
     access_token = request.oauth.resource_owner_key
     token = AccessToken.find_one({'token': access_token})
     if not token:
-        abort_json(404,
-                   flag="fail",
-                   msg="Access token doesn't associate with any user")
+        raise ApiException(
+            code=404,
+            msg="Access token doesn't associate with any user",
+            )
     client = Client.find_one({"_id": token["client_id"]})
     if not client:
-        abort_json(404,
-                   flag="fail",
-                   msg="Access token doesn't associate with any client")
+        raise ApiException(
+            code=404,
+            msg="Access token doesn't associate with any client",
+            )
     return client

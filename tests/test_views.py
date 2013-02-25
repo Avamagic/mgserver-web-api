@@ -2,6 +2,7 @@ from werkzeug.urls import url_quote
 from flask import url_for
 from mgserver.extensions import provider, totp
 from mgserver.database import ResourceOwner as User, Client
+from mgserver.api import ApiException
 from tests import TestCase
 
 
@@ -190,6 +191,16 @@ class TestApi(TestCase):
 
         assert "fail" == seed["flag"]
         assert "Client key not found" in seed["msg"]
+
+    def test_ApiException_default(self):
+        e = ApiException()
+        assert 500 == e.code
+        assert "" == e.msg
+
+    def test_ApiException_explicit(self):
+        e = ApiException(401, "Unauthorized")
+        assert 401 == e.code
+        assert "Unauthorized" == e.msg
 
 
 class TestError(TestCase):
