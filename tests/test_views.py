@@ -1,6 +1,6 @@
 from werkzeug.urls import url_quote
-from flask import url_for
-from mgserver.extensions import provider
+from flask import url_for, json
+from mgserver.extensions import provider, totp
 from mgserver.database import ResourceOwner as User, Client
 from tests import TestCase
 
@@ -157,6 +157,39 @@ class TestApi(TestCase):
     def test_unauthorized(self):
         response = self.client.get('/v1/devices')
         self.assert_400(response)
+
+    def test_seed(self):
+        data = {
+            "otp": str(totp.now()),
+            "consumer_key": self.known_client["client_key"],
+            }
+        response = self.client.post("/v1/seeds", data=data)
+        seed = json.loads(response.data)
+
+        assert "success" == seed["flag"]
+        assert str(self.known_user["_id"]) != seed["user_id"]
+
+    def test_seed_invalid_otp(self):
+        data = {
+            "otp": "1111111111",
+            "consumer_key": self.known_client["client_key"],
+            }
+        response = self.client.post("/v1/seeds", data=data)
+        seed = response.json
+
+        assert "fail" == seed["flag"]
+        assert "OTP incorrect" in seed["msg"]
+
+    def test_seed_invalid_client_key(self):
+        data = {
+            "otp": str(totp.now()),
+            "consumer_key": "111234567",
+            }
+        response = self.client.post("/v1/seeds", data=data)
+        seed = response.json
+
+        assert "fail" == seed["flag"]
+        assert "Client key not found" in seed["msg"]
 
 
 class TestError(TestCase):

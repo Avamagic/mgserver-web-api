@@ -15,14 +15,14 @@ class TestCase(Base):
         return app
 
     def init_data(self):
-        user = create_user(
+        self.known_user = create_user(
             "known_user@example.com",
             "9527",
             "Known User"
             )
 
-        client = create_client(
-            user["_id"],
+        self.known_client = create_client(
+            self.known_user["_id"],
             "Known app",
             "Official known app for testing",
             "known://fake/app"
