@@ -1,5 +1,5 @@
 from werkzeug.urls import url_quote
-from flask import url_for, json
+from flask import url_for
 from mgserver.extensions import provider, totp
 from mgserver.database import ResourceOwner as User, Client
 from tests import TestCase
@@ -164,7 +164,7 @@ class TestApi(TestCase):
             "consumer_key": self.known_client["client_key"],
             }
         response = self.client.post("/v1/seeds", data=data)
-        seed = json.loads(response.data)
+        seed = response.json
 
         assert "success" == seed["flag"]
         assert str(self.known_user["_id"]) != seed["user_id"]
