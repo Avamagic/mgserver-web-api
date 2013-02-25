@@ -57,10 +57,6 @@ device_fields = {
 
 
 def get_user_or_abort():
-    if not hasattr(request, "oauth"):
-        abort_json(401,
-                   flag="fail",
-                   msg="Missing OAuth token")
     access_token = request.oauth.resource_owner_key
     token = AccessToken.find_one({'token': access_token})
     if not token:

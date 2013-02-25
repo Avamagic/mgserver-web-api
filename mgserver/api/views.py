@@ -40,7 +40,7 @@ class Seed(MethodView):
 
 class Myself(MethodView):
 
-    method_decorators = [provider.require_oauth(realm="users")]
+    decorators = [provider.require_oauth(realm="users")]
 
     def post(self):
         user = get_user_or_abort()
@@ -70,7 +70,7 @@ class Myself(MethodView):
 
 class DeviceList(MethodView):
 
-    method_decorators = [provider.require_oauth(realm="users")]
+    decorators = [provider.require_oauth(realm="users")]
 
     def post(self):
         user = get_user_or_abort()
@@ -110,7 +110,7 @@ class DeviceList(MethodView):
 
 class DeviceRes(MethodView):
 
-    method_decorators = [provider.require_oauth(realm="users")]
+    decorators = [provider.require_oauth(realm="users")]
 
     def get(self, device_id):
         device = Device.find_one({'_id': ObjectId(device_id)})

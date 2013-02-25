@@ -156,7 +156,7 @@ class TestApi(TestCase):
 
     def test_unauthorized(self):
         response = self.client.get('/v1/devices')
-        self.assert_401(response)
+        self.assert_400(response)
 
 
 class TestError(TestCase):
