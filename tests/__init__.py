@@ -1,9 +1,11 @@
 from flask import url_for
 from flask.ext.testing import TestCase as Base
+from flask.ext.restful import marshal
 from mgserver import create_app
 from mgserver.database import get_db
 from mgserver.configs import TestConfig
-from mgserver.frontend.utils import create_user, create_client
+from mgserver.frontend import create_user, create_client
+from mgserver.api import user_fields, device_fields
 
 
 class TestCase(Base):
@@ -20,6 +22,7 @@ class TestCase(Base):
             "9527",
             "Known User"
             )
+        self.known_user_marshalled = marshal(self.known_user, user_fields)
 
         self.known_client = create_client(
             self.known_user["_id"],

@@ -153,11 +153,22 @@ class TestFrontend(TestCase):
         self.assert_template_used(name="index.html")
 
 
-class TestApi(TestCase):
+class TestOAuth(TestCase):
 
     def test_unauthorized(self):
         response = self.client.get('/v1/devices')
         self.assert_400(response)
+
+
+class TestApi(TestCase):
+
+    def setUp(self):
+        super(TestApi, self).setUp()
+
+        self.app.config["TESTING_WITHOUT_OAUTH"] = {
+            "known_user": self.known_user,
+            "known_client": self.known_client,
+            }
 
     def test_seed(self):
         data = {
@@ -191,6 +202,26 @@ class TestApi(TestCase):
 
         assert "fail" == seed["flag"]
         assert "Client key not found" in seed["msg"]
+
+    def test_myself_get(self):
+        resp = self.client.get("/v1/me")
+
+        assert "success" == resp.json["flag"]
+        assert str(self.known_user["_id"]) == resp.json["res"]["_id"]
+
+    def test_myself_post(self):
+        old_timestamp = self.known_user_marshalled["updated_since"]
+        data = {
+            "name": "My New Awesome Name",
+            "email": "my_new_awesome_email@example.com",
+            }
+        resp = self.client.post("/v1/me", data=data)
+
+        assert "success" == resp.json["flag"]
+        assert str(self.known_user["_id"]) == resp.json["res"]["_id"]
+        assert resp.json["res"]["name"] == data["name"]
+        assert resp.json["res"]["email"] == data["email"]
+        assert resp.json["res"]["updated_since"] >= old_timestamp
 
     def test_ApiException_default(self):
         e = ApiException()

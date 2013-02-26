@@ -1,6 +1,5 @@
 import time
-from werkzeug.exceptions import HTTPException
-from flask import json, make_response, request, abort
+from flask import request, current_app
 from flask.ext.restful import reqparse, fields
 from ..database import ResourceOwner as User, Client, AccessToken
 from .exceptions import ApiException
@@ -50,6 +49,9 @@ device_fields = {
 
 
 def get_user_or_abort():
+    if "TESTING_WITHOUT_OAUTH" in current_app.config:
+        return current_app.config["TESTING_WITHOUT_OAUTH"]["known_user"]
+
     access_token = request.oauth.resource_owner_key
     token = AccessToken.find_one({'token': access_token})
     if not token:
@@ -64,6 +66,9 @@ def get_user_or_abort():
 
 
 def get_client_or_abort():
+    if "TESTING_WITHOUT_OAUTH" in current_app.config:
+        return current_app.config["TESTING_WITHOUT_OAUTH"]["known_client"]
+
     access_token = request.oauth.resource_owner_key
     token = AccessToken.find_one({'token': access_token})
     if not token:

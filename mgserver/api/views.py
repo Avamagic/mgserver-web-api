@@ -1,5 +1,6 @@
+from functools import wraps
 from flask import Blueprint, request, abort, jsonify
-from flask import make_response, json
+from flask import make_response, json, current_app
 from flask.views import MethodView
 from flask.ext.restful import marshal
 from bson.objectid import ObjectId
@@ -24,6 +25,18 @@ def handle_api_exception(error):
     resp = make_response(json.dumps(data), error.code)
     resp.headers["Content-Type"] = "application/json"
     return resp
+
+
+def require_oauth(f):
+    @wraps(f)
+    def deco(*args, **kwargs):
+        if "TESTING_WITHOUT_OAUTH" in current_app.config:
+            return f(*args, **kwargs)
+        else:
+            decorator = provider.require_oauth(realm="users")
+            meth = decorator(f)
+            return meth(*args, **kwargs)
+    return deco
 
 
 class Seed(MethodView):
@@ -58,7 +71,7 @@ class Seed(MethodView):
 
 class Myself(MethodView):
 
-    decorators = [provider.require_oauth(realm="users")]
+    decorators = [require_oauth]
 
     def post(self):
         user = get_user_or_abort()
@@ -88,7 +101,7 @@ class Myself(MethodView):
 
 class DeviceList(MethodView):
 
-    decorators = [provider.require_oauth(realm="users")]
+    decorators = [require_oauth]
 
     def post(self):
         user = get_user_or_abort()
@@ -128,7 +141,7 @@ class DeviceList(MethodView):
 
 class DeviceRes(MethodView):
 
-    decorators = [provider.require_oauth(realm="users")]
+    decorators = [require_oauth]
 
     def get(self, device_id):
         device = Device.find_one({'_id': ObjectId(device_id)})
