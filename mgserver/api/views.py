@@ -73,7 +73,7 @@ class Myself(MethodView):
 
     decorators = [require_oauth]
 
-    def post(self):
+    def put(self):
         user = get_user_or_abort()
         args = parser.parse_args()
 

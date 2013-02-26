@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, flash, url_for
 from flask.ext.login import current_user, login_required, login_user, logout_user
 from bson.objectid import ObjectId
-from ..database.models import Client, Device
+from ..database import Client, Device
 from .forms import LoginForm, SignupForm, ClientForm
 from .utils import create_user, get_valid_user, create_client
 from .exceptions import CreateClientException, SignupException

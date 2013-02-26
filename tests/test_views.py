@@ -209,7 +209,21 @@ class TestApi(TestCase):
         assert "success" == resp.json["flag"]
         assert str(self.known_user["_id"]) == resp.json["res"]["_id"]
 
-    def test_myself_post(self):
+    def test_myself_put(self):
+        old_timestamp = self.known_user_marshalled["updated_since"]
+        data = {
+            "name": "My New Awesome Name",
+            "email": "my_new_awesome_email@example.com",
+            }
+        resp = self.client.put("/v1/me", data=data)
+
+        assert "success" == resp.json["flag"]
+        assert str(self.known_user["_id"]) == resp.json["res"]["_id"]
+        assert resp.json["res"]["name"] == data["name"]
+        assert resp.json["res"]["email"] == data["email"]
+        assert resp.json["res"]["updated_since"] >= old_timestamp
+
+    def test_myself_post_not_allowed(self):
         old_timestamp = self.known_user_marshalled["updated_since"]
         data = {
             "name": "My New Awesome Name",
@@ -217,11 +231,7 @@ class TestApi(TestCase):
             }
         resp = self.client.post("/v1/me", data=data)
 
-        assert "success" == resp.json["flag"]
-        assert str(self.known_user["_id"]) == resp.json["res"]["_id"]
-        assert resp.json["res"]["name"] == data["name"]
-        assert resp.json["res"]["email"] == data["email"]
-        assert resp.json["res"]["updated_since"] >= old_timestamp
+        self.assert_405(resp)
 
     def test_ApiException_default(self):
         e = ApiException()
