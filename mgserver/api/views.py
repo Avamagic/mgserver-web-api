@@ -9,7 +9,7 @@ import pyotp
 from ..extensions import bcrypt, provider, totp
 from ..database import ResourceOwner as User, Client, Device
 from .utils import (parser, user_fields, device_fields,
-                    get_user_or_abort, get_client_or_abort)
+                    get_user_or_abort, get_client_or_abort, get_device_or_abort)
 from .exceptions import ApiException
 
 
@@ -103,64 +103,87 @@ class DeviceList(MethodView):
 
     decorators = [require_oauth]
 
-    def post(self):
-        user = get_user_or_abort()
-        client = get_client_or_abort()
+    def put(self, device_id):
+        if device_id is None:
+            raise ApiException(
+                code=400,
+                msg="Does not support updating multiple devices",
+                )
+        elif device_id == "from_access_token":
+            device = get_device_or_abort()
+        else:
+            device = Device.find_one({'_id': ObjectId(device_id)})
+            if not device:
+                raise ApiException(
+                    code=404,
+                    msg="Device {} doesn't exist".format(device_id),
+                    )
+
         args = parser.parse_args()
 
-        device_dict = {
-            u"resource_owner_id": user["_id"],
-            u"client_id": client["_id"],
-            u"vendor": args["vendor"],
-            u"model": args["model"],
-        }
-        device = Device(**device_dict)
+        if args["name"]:
+            device["name"] = args["name"]
+        if args["description"]:
+            device["description"] = args["description"]
+        if args["vendor"]:
+            device["vendor"] = args["vendor"]
+        if args["model"]:
+            device["model"] = args["model"]
+        device["updated_since"] = datetime.utcnow()
         Device.save(device)
 
-        # save back to user
-        user.device_ids.append(device["_id"])
-        User.save(user)
-
         return jsonify({
                 "flag": "success",
                 "res": marshal(device, device_fields),
                 })
-
-    def get(self):
-        user = get_user_or_abort()
-        devices = Device.find(
-            {'_id': {'$in': [oid for oid in user.device_ids]}})
-        devices_marshaled = []
-        for device in devices:
-            devices_marshaled.append(marshal(device, device_fields))
-        return jsonify({
-                "flag": "success",
-                "res": devices_marshaled,
-                })
-
-
-class DeviceRes(MethodView):
-
-    decorators = [require_oauth]
 
     def get(self, device_id):
-        device = Device.find_one({'_id': ObjectId(device_id)})
-        if not device:
-            raise ApiException(
-                code=404,
-                msg="Device {} doesn't exist".format(device_id),
-                )
-        return jsonify({
-                "flag": "success",
-                "res": marshal(device, device_fields),
-                })
+        if device_id is None:
+            user = get_user_or_abort()
+            devices = Device.find(
+                {'_id': {'$in': [oid for oid in user.device_ids]}})
+            devices_marshaled = []
+            for device in devices:
+                devices_marshaled.append(marshal(device, device_fields))
+            return jsonify({
+                    "flag": "success",
+                    "res": devices_marshaled,
+                    })
+        elif device_id == "from_access_token":
+            device = get_device_or_abort()
+            return jsonify({
+                    "flag": "success",
+                    "res": marshal(device, device_fields),
+                    })
+        else:
+            device = Device.find_one({'_id': ObjectId(device_id)})
+            if not device:
+                raise ApiException(
+                    code=404,
+                    msg="Device {} doesn't exist".format(device_id),
+                    )
+            return jsonify({
+                    "flag": "success",
+                    "res": marshal(device, device_fields),
+                    })
 
 
 api.add_url_rule("/v1/seeds",
                  view_func=Seed.as_view("seeds"))
+
+device_list_view = DeviceList.as_view("devices")
 api.add_url_rule("/v1/devices",
-                 view_func=DeviceList.as_view("devices"))
+                 defaults={"device_id": None},
+                 view_func=device_list_view,
+                 methods=["GET",])
 api.add_url_rule("/v1/devices/<string:device_id>",
-                 view_func=DeviceRes.as_view("device"))
+                 view_func=device_list_view,
+                 methods=["GET", "PUT"])
+api.add_url_rule("/v1/device",
+                 defaults={"device_id": "from_access_token"},
+                 view_func=device_list_view,
+                 methods=["GET", "PUT"])
+
 api.add_url_rule("/v1/me",
-                 view_func=Myself.as_view("myself"))
+                 view_func=Myself.as_view("myself"),
+                 methods=["GET", "PUT"])

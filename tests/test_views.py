@@ -1,4 +1,5 @@
 from werkzeug.urls import url_quote
+from bson.objectid import ObjectId
 from flask import url_for
 from mgserver.extensions import provider, totp
 from mgserver.database import ResourceOwner as User, Client
@@ -168,6 +169,7 @@ class TestApi(TestCase):
         self.app.config["TESTING_WITHOUT_OAUTH"] = {
             "known_user": self.known_user,
             "known_client": self.known_client,
+            "known_device": self.known_device,
             }
 
     def test_seed(self):
@@ -224,7 +226,6 @@ class TestApi(TestCase):
         assert resp.json["res"]["updated_since"] >= old_timestamp
 
     def test_myself_post_not_allowed(self):
-        old_timestamp = self.known_user_marshalled["updated_since"]
         data = {
             "name": "My New Awesome Name",
             "email": "my_new_awesome_email@example.com",
@@ -232,6 +233,91 @@ class TestApi(TestCase):
         resp = self.client.post("/v1/me", data=data)
 
         self.assert_405(resp)
+
+    def test_devices_get_all(self):
+        resp = self.client.get("/v1/devices")
+        assert "success" == resp.json["flag"]
+
+        devices = resp.json["res"]
+        assert len(devices) == 1
+
+        device = devices[0]
+        assert str(self.known_device["_id"]) == str(device["_id"])
+        assert str(self.known_access_token["_id"]) == str(device["access_token_id"])
+
+    def test_device_get_from_token(self):
+        resp = self.client.get("/v1/device")
+        assert "success" == resp.json["flag"]
+
+        device = resp.json["res"]
+        assert str(self.known_device["_id"]) == device["_id"]
+        assert str(self.known_access_token["_id"]) == device["access_token_id"]
+
+    def test_device_get_from_id(self):
+        resp = self.client.get("/v1/devices/{}".format(str(self.known_device["_id"])))
+        assert "success" == resp.json["flag"]
+
+        device = resp.json["res"]
+        assert str(self.known_device["_id"]) == device["_id"]
+        assert str(self.known_access_token["_id"]) == device["access_token_id"]
+
+    def test_device_put_with_token(self):
+        old_timestamp = self.known_device_marshalled["updated_since"]
+        data = {
+            "name": "My New Awesome Name",
+            "description": "My new not so awesome description",
+            "vendor": "Avamagic",
+            "model": "MGServer Client",
+            }
+        resp = self.client.put("/v1/device", data=data)
+
+        assert "success" == resp.json["flag"]
+        device = resp.json["res"]
+        assert str(self.known_device["_id"]) == device["_id"]
+        assert device["name"] == data["name"]
+        assert device["description"] == data["description"]
+        assert device["vendor"] == data["vendor"]
+        assert device["model"] == data["model"]
+        assert device["updated_since"] >= old_timestamp
+
+    def test_device_put_with_id(self):
+        old_timestamp = self.known_device_marshalled["updated_since"]
+        data = {
+            "name": "My New Awesome Name",
+            "description": "My new not so awesome description",
+            "vendor": "Avamagic",
+            "model": "MGServer Client",
+            }
+        resp = self.client.put("/v1/devices/{}".format(str(self.known_device["_id"])),
+                               data=data)
+
+        assert "success" == resp.json["flag"]
+        device = resp.json["res"]
+        assert str(self.known_device["_id"]) == device["_id"]
+        assert device["name"] == data["name"]
+        assert device["description"] == data["description"]
+        assert device["vendor"] == data["vendor"]
+        assert device["model"] == data["model"]
+        assert device["updated_since"] >= old_timestamp
+
+    def test_device_put_nonexist(self):
+        old_timestamp = self.known_device_marshalled["updated_since"]
+        data = {
+            "name": "My New Awesome Name",
+            "description": "My new not so awesome description",
+            "vendor": "Avamagic",
+            "model": "MGServer Client",
+            }
+        nonexist_oid = ObjectId()
+        resp = self.client.put("/v1/devices/{}".format(str(nonexist_oid)),
+                               data=data)
+
+        self.assert_404(resp)
+
+        resp = self.client.get("/v1/device")
+        assert "success" == resp.json["flag"]
+        device = resp.json["res"]
+        assert old_timestamp == device["updated_since"]
 
     def test_ApiException_default(self):
         e = ApiException()

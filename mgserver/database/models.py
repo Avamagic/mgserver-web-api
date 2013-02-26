@@ -104,8 +104,8 @@ class Device(Model):
     table = "devices"
 
     def __init__(self,
-                 resource_owner_id, client_id,
-                 vendor, model,
+                 access_token_id,
+                 vendor="", model="",
                  features=[],
                  name="", description=""):
         now = datetime.utcnow()
@@ -115,8 +115,7 @@ class Device(Model):
         self.vendor = vendor
         self.model = model
         self.features = []
-        self.resource_owner_id = resource_owner_id
-        self.client_id = client_id
+        self.access_token_id = access_token_id
 
         self.mgserver_id = uuid.uuid4()
         self.created_at = now
