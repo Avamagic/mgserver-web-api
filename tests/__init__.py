@@ -4,9 +4,22 @@ from flask.ext.testing import TestCase as Base
 from flask.ext.restful import marshal
 from mgserver import create_app
 from mgserver.configs import TestConfig
-from mgserver.frontend import create_user, create_client
 from mgserver.api import user_fields, device_fields
 from mgserver.database import ResourceOwner as User, AccessToken, Device
+from mgserver.database import create_user, create_client
+from mgserver.database import get_or_create_device
+
+
+def create_access_token(token, user, client):
+    token = AccessToken(token="known_token")
+    token["resource_owner_id"] = user["_id"]
+    token["client_id"] = client["_id"]
+    AccessToken.save(token)
+
+    user["access_tokens"].append(token["_id"])
+    User.save(user)
+
+    return token
 
 
 class TestCase(Base):
@@ -25,28 +38,28 @@ class TestCase(Base):
             )
 
         client = create_client(
-            user["_id"],
+            user,
             "Known app",
             "Official known app for testing",
             "known://fake/app"
             )
         self.known_client = client
 
-        access_token = AccessToken(token="known_token")
-        access_token["resource_owner_id"] = user["_id"]
-        access_token["client_id"] = client["_id"]
-        AccessToken.save(access_token)
+        access_token = create_access_token(
+            "known_token",
+            user,
+            client,
+            )
         self.known_access_token = access_token
 
-        device = Device(access_token_id=access_token["_id"])
-        Device.save(device)
+        device = get_or_create_device(access_token)
         self.known_device = device
-        self.known_device_marshalled = marshal(self.known_device, device_fields)
+        self.known_device_marshalled = marshal(device, device_fields)
 
-        user["client_ids"].append(client["_id"])
-        user["device_ids"].append(device["_id"])
-        user["access_tokens"].append(access_token["_id"])
-        User.save(user)
+        # fetch user again, since it might be modified
+        user_dict = User.find_one({"_id": user["_id"]})
+        user = User()
+        user.update(user_dict)
         self.known_user = user
         self.known_user_marshalled = marshal(user, user_fields)
 

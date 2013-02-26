@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, redirect, flash, url_for
 from flask.ext.login import current_user, login_required, login_user, logout_user
 from bson.objectid import ObjectId
+from ..common import CreateClientException, SignupException
 from ..database import Client, Device
+from ..database import create_user, create_client
 from .forms import LoginForm, SignupForm, ClientForm
-from .utils import create_user, get_valid_user, create_client
-from .exceptions import CreateClientException, SignupException
+from .utils import get_valid_user
 
 
 frontend = Blueprint('frontend', __name__)
@@ -39,7 +40,7 @@ def apps():
     form = ClientForm()
     if form.validate_on_submit():
         try:
-            create_client(current_user["_id"],
+            create_client(current_user._get_current_object(),
                           form.name.data,
                           form.description.data,
                           form.callback.data)

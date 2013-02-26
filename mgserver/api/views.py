@@ -6,11 +6,11 @@ from flask.ext.restful import marshal
 from bson.objectid import ObjectId
 from datetime import datetime
 import pyotp
+from ..common import ApiException
 from ..extensions import bcrypt, provider, totp
 from ..database import ResourceOwner as User, Client, Device
-from .utils import (parser, user_fields, device_fields,
-                    get_user_or_abort, get_client_or_abort, get_device_or_abort)
-from .exceptions import ApiException
+from ..database import get_user_or_abort, get_client_or_abort, get_device_or_abort
+from .utils import parser, user_fields, device_fields
 
 
 api = Blueprint("api", __name__)

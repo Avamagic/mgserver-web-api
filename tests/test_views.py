@@ -1,9 +1,9 @@
 from werkzeug.urls import url_quote
 from bson.objectid import ObjectId
 from flask import url_for
+from mgserver.common import ApiException
 from mgserver.extensions import provider, totp
 from mgserver.database import ResourceOwner as User, Client
-from mgserver.api import ApiException
 from tests import TestCase
 
 

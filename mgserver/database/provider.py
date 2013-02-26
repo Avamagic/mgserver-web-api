@@ -2,6 +2,7 @@ from flask import request, render_template, g, url_for, redirect
 from flask.ext.oauthprovider import OAuthProvider
 from flask.ext.login import current_user
 from bson.objectid import ObjectId
+from .helper import get_or_create_device
 from .models import ResourceOwner as User, Client, Nonce
 from .models import RequestToken, AccessToken
 
@@ -267,6 +268,9 @@ class MongoProvider(OAuthProvider):
                 token['realm'] = req_token['realm']
 
                 AccessToken.insert(token)
+
+                # make sure device exist
+                device = get_or_create_device(token)
 
     def save_timestamp_and_nonce(self, client_key, timestamp, nonce,
             request_token=None, access_token=None):
