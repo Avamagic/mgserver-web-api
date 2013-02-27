@@ -140,8 +140,9 @@ class DeviceList(MethodView):
     def get(self, device_id):
         if device_id is None:
             user = get_user_or_abort()
-            devices = Device.find(
-                {'_id': {'$in': [oid for oid in user.device_ids]}})
+            devices = Device \
+                .find({'_id': {'$in': [oid for oid in user.device_ids]}}) \
+                .sort('updated_since', -1)
             devices_marshaled = []
             for device in devices:
                 devices_marshaled.append(marshal(device, device_fields))

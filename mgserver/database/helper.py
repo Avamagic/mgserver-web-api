@@ -64,6 +64,10 @@ def get_or_create_device(access_token):
                 )
 
         Device.ensure_index("access_token_id")
+        Device.ensure_index("created_at")
+        Device.ensure_index("updated_since")
+        Device.ensure_index("name")
+
         device_dict = {"access_token_id": access_token["_id"]}
         device = Device(**device_dict)
         Device.save(device)
