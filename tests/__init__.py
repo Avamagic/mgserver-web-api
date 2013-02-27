@@ -96,3 +96,12 @@ class TestCase(Base):
         if template:
             self.assert_template_used(name=template)
         return response
+
+
+class TestCaseWithoutAuth(Base):
+    """TestClass which does not require authentication."""
+
+    def create_app(self):
+        """Create and return a testing flask app."""
+        app = create_app(TestConfig)
+        return app

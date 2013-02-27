@@ -1,4 +1,4 @@
-import time
+import calendar
 from flask.ext.restful import reqparse, fields
 
 
@@ -17,7 +17,7 @@ class Epoch(fields.Raw):
     """Return a Unix time-formatted datetime string in UTC"""
     def format(self, value):
         try:
-            return int(time.mktime(value.utctimetuple()))
+            return int(calendar.timegm(value.utctimetuple()))
         except AttributeError as ae:
             raise fields.MarshallingException(ae)
 
